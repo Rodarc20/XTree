@@ -2,7 +2,19 @@
 #include "Nodo.h"
 
 
+Nodo::Nodo(vector<double> p) {
+    DataPoint = p;
+    PointN = p;
+    PointP = p;
+    bDataPoint = true;
+    bHoja = false;
+    Padre = nullptr;
+}
+
 Nodo::Nodo() {
+    bDataPoint = false;
+    bHoja = false;
+    Padre = nullptr;
 }
 
 
@@ -44,18 +56,43 @@ void Nodo::CalcularCoverage() {
 }
 
 bool Nodo::Pertenece(vector<double> p) {
-    return false;
+    bool acum = true;
+    for (int i = 0; acum && i < PointN.size(); i++) {
+        acum &= PointN[i] <= p[i] && p[i] <= PointP[i];
+    }
+    return acum;
 }
 
 void Nodo::AddHijo(Nodo * hijo) {
+    hijo->Padre = this;
+    Hijos.push_back(hijo);
 }
 
 void Nodo::Imprimir(int iden) {
+    cout << Identacion(iden) << "Region: PN (";
+    for (int i = 0; i < PointN.size()-1; i++) {
+        cout << PointN[i] << ", ";
+    }
+    cout << PointN[PointN.size()-1] << ")";
+    cout << " - PP (";
+    for (int i = 0; i < PointP.size()-1; i++) {
+        cout << PointP[i] << ", ";
+    }
+    cout << PointP[PointP.size()-1] << ")" << endl;
+    if (bDataPoint) {
+        cout << Identacion(iden) << "Punto: (";
+        for (int i = 0; i < DataPoint.size()-1; i++) {
+            cout << DataPoint[i] << ", ";
+        }
+        cout << DataPoint[DataPoint.size()-1] << ")" << endl;
+    }
+    for (int i = 0; i < Hijos.size(); i++) {
+        cout << Identacion(iden+1) << "Hijo " << i << endl;
+        Hijos[i]->Imprimir(iden+1);
+    }
 }
 
 string Nodo::Identacion(int Tam) {
-    return string();
+    return string(Tam * 4, ' ');
 }
 
-Nodo::Nodo(vector<double> p) {
-}

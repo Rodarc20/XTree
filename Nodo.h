@@ -14,6 +14,7 @@ class Nodo {
         vector<double> DataPoint;
         bool bDataPoint;
         bool bHoja;//si es hoja, tiene un DataPoint, es decir apunt hacia algo un registro o algo, si no es hoja quiere decir que tiene hijos
+        bool bSuperNode;
         double CoverageArea();
         void CalcularCoverage();
         bool Pertenece(vector<double> p);

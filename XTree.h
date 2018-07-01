@@ -19,8 +19,8 @@ class XTree {
         void AdjustTree(Nodo * N, Nodo * NN);
         vector<int> PickSeeds(vector<Nodo *> & Entradas);
         int PickNext(vector<Nodo *> & Entradas, Nodo * G1, Nodo * G2);
-        void ComponerRegion(vector<double> R1LU, vector<double> R1RB, vector<double> R2LU, vector<double> R2RB, vector<double> & RLU, vector<double> & RRB);
-        float AreaRegion(vector<double> LU, vector<double> RB);//deberia tener usar la clase region
+        void ComponerRegion(vector<double> & R1N, vector<double> & R1P, vector<double> & R2N, vector<double> & R2P, vector<double> & RN, vector<double> & RP);//RN y RP son parametros que son la salida de esta funcion
+        double AreaRegion(vector<double> & N, vector<double> & P);//deberia tener usar la clase region
         void Imprimir();
         string Identacion(int Tam);
 

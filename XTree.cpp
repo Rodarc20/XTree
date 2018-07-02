@@ -5,14 +5,14 @@
 
 XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
-    M = 5;
+    M = 4;
     m = 2;
     Root = nullptr;
 }
 
 XTree::XTree() {
     Dimensions = 3;
-    M = 5;
+    M = 4;
     m = 2;
     Root = nullptr;
 }
@@ -38,8 +38,8 @@ Nodo * XTree::ChooseLeaf(Nodo * Data) {
 
         for (int i = 0; i < N->Hijos.size(); i++) {
             //ver que area crece mas
-            vector<double> DN;
-            vector<double> DP;
+            vector<double> DN (Dimensions);
+            vector<double> DP (Dimensions);
             ComponerRegion(N->Hijos[i]->PointN, N->Hijos[i]->PointP, Data->PointN, Data->PointP, DN, DP);
             double area = AreaRegion(DN, DP);
             double d = area - N->Hijos[i]->CoverageArea();
@@ -80,14 +80,14 @@ Nodo * XTree::SplitNodo(Nodo * nodo) {
         int next = PickNext(EntradasRestantes, nodo, NN);
         Nodo * nodonext = EntradasRestantes[next];
         //ver que area crece mas
-        vector<double> DN;
-        vector<double> DP;
+        vector<double> DN (Dimensions);
+        vector<double> DP (Dimensions);
         ComponerRegion(nodo->PointN, nodo->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
-        float area1 = AreaRegion(DN, DP);
-        float d1 = area1 - nodo->CoverageArea();
+        double area1 = AreaRegion(DN, DP);
+        double d1 = area1 - nodo->CoverageArea();
         ComponerRegion(NN->PointN, NN->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
-        float area2 = AreaRegion(DN, DP);
-        float d2 = area2 - NN->CoverageArea();
+        double area2 = AreaRegion(DN, DP);
+        double d2 = area2 - NN->CoverageArea();
         if (d1 < d2) {
             nodo->AddHijo(nodonext);
             nodo->CalcularCoverage();
@@ -173,30 +173,30 @@ void XTree::AdjustTree(Nodo * N, Nodo * NN) {
 vector<int> XTree::PickSeeds(vector<Nodo*>& Entradas) {
     int iMax = 0;
     int jMax = 1;
-    float dMax = 0;
-    vector<double> JN;
-    vector<double> JP;
+    double dMax = 0;
+    vector<double> JN (Dimensions);
+    vector<double> JP (Dimensions);
     for (int i = 0; i < Entradas.size(); i++) {
         for (int j = i + 1; j < Entradas.size(); j++) {
             for (int k = 0; k < Dimensions; k++) {
                 if (Entradas[i]->PointN[k] < Entradas[j]->PointN[k]) {
-                    JN[i] = Entradas[i]->PointN[k];
+                    JN[k] = Entradas[i]->PointN[k];
                 }
                 else {
-                    JN[i] = Entradas[j]->PointN[k];
+                    JN[k] = Entradas[j]->PointN[k];
                 }
                 if (Entradas[i]->PointP[k] > Entradas[j]->PointP[k]) {
-                    JP[i] = Entradas[i]->PointP[k];
+                    JP[k] = Entradas[i]->PointP[k];
                 }
                 else {
-                    JP[i] = Entradas[j]->PointP[k];
+                    JP[k] = Entradas[j]->PointP[k];
                 }
             }
             //calculado J
-            float areaJ = AreaRegion(JN, JP);
-            float areaEI = Entradas[i]->CoverageArea();
-            float areaEJ = Entradas[j]->CoverageArea();
-            float d = areaJ - areaEI - areaEJ;
+            double areaJ = AreaRegion(JN, JP);
+            double areaEI = Entradas[i]->CoverageArea();
+            double areaEJ = Entradas[j]->CoverageArea();
+            double d = areaJ - areaEI - areaEJ;
             if (d > dMax) {
                 dMax = d;
                 iMax = i;
@@ -214,15 +214,15 @@ int XTree::PickNext(vector<Nodo*>& Entradas, Nodo * G1, Nodo * G2) {
     vector<double> d1s(Entradas.size(), 0);
     vector<double> d2s(Entradas.size(), 0);
     int iMax = 0;
-    float dMax = 0;
+    double dMax = 0;
     for (int i = 0; i < Entradas.size(); i++) {
-        vector<double> DN;
-        vector<double> DP;
+        vector<double> DN (Dimensions);
+        vector<double> DP (Dimensions);
         ComponerRegion(G1->PointN, G1->PointP, Entradas[i]->PointN, Entradas[i]->PointP, DN, DP);
-        float d1 = AreaRegion(DN, DP) - G1->CoverageArea();
+        double d1 = AreaRegion(DN, DP) - G1->CoverageArea();
         ComponerRegion(G2->PointN, G2->PointP, Entradas[i]->PointN, Entradas[i]->PointP, DN, DP);
-        float d2 = AreaRegion(DN, DP) - G2->CoverageArea();
-        float d = abs(d1 - d2);
+        double d2 = AreaRegion(DN, DP) - G2->CoverageArea();
+        double d = abs(d1 - d2);
         if (d > dMax) {
             dMax = d;
             iMax = i;

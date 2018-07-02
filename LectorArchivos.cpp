@@ -7,7 +7,7 @@ vector<vector<double>> LectorArchivos::ObtenerPuntos() {
     std::string line;
     //std::ifstream myfile ("./country-capitals.csv");
     //std::ifstream myfile ("./crime50k3.csv");
-    std::ifstream myfile ("D:/UCSP/TareasUCSP_ws/TareasUCSP/EDA/DataSets/YearPredictionMSD/YearPredicyionMSD.txt");
+    std::ifstream myfile ("D:/UCSP/EDA/DataSets/YearPredictionMSD/YearPredictionMSD.txt");
     //std::ifstream myfile ("D:/UCSP/TareasUCSP_ws/TareasUCSP/EDA/QuadTreeVisualization/crime50k3.csv");
     //archivos de prueba, esot no requiere la covnersion posterior a
     if (myfile.is_open()) {

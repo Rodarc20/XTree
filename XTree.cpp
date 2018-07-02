@@ -7,12 +7,14 @@ XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
     M = 5;
     m = 2;
+    Root = nullptr;
 }
 
 XTree::XTree() {
     Dimensions = 3;
     M = 5;
     m = 2;
+    Root = nullptr;
 }
 
 
@@ -60,7 +62,53 @@ Nodo * XTree::ChooseLeaf(Nodo * Data) {
 }
 
 Nodo * XTree::SplitNodo(Nodo * nodo) {
-    return nullptr;
+    vector<int> seeds = PickSeeds(nodo->Hijos);
+    vector<Nodo *> EntradasRestantes = nodo->Hijos;
+    Nodo * G1 = nodo->Hijos[seeds[0]];
+    Nodo * G2 = nodo->Hijos[seeds[1]];
+    nodo->Hijos.clear();
+    nodo->CalcularCoverage();
+    Nodo * NN = new Nodo();
+    NN->bHoja = nodo->bHoja;
+    nodo->AddHijo(G1);
+    NN->AddHijo(G2);
+    NN->CalcularCoverage();
+    EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), G1));
+    EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), G2));
+    while (!EntradasRestantes.empty()) {
+        //falta un if aqui, segun el paper, es uno que conrtola que ambos grupos tenga el minimo
+        int next = PickNext(EntradasRestantes, nodo, NN);
+        Nodo * nodonext = EntradasRestantes[next];
+        //ver que area crece mas
+        vector<double> DN;
+        vector<double> DP;
+        ComponerRegion(nodo->PointN, nodo->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
+        float area1 = AreaRegion(DN, DP);
+        float d1 = area1 - nodo->CoverageArea();
+        ComponerRegion(NN->PointN, NN->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
+        float area2 = AreaRegion(DN, DP);
+        float d2 = area2 - NN->CoverageArea();
+        if (d1 < d2) {
+            nodo->AddHijo(nodonext);
+            nodo->CalcularCoverage();
+        }
+        else if (d2 < d1) {
+            NN->AddHijo(nodonext);
+            NN->CalcularCoverage();
+        }
+        else{
+            if (area1 < area2) {
+                nodo->AddHijo(nodonext);
+                nodo->CalcularCoverage();
+            }
+            else {
+                NN->AddHijo(nodonext);
+                NN->CalcularCoverage();
+            }
+        }
+        EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), nodonext));
+    }
+    return NN;
 }
 
 void XTree::Insert(vector<double> point) {
@@ -83,7 +131,6 @@ void XTree::Insert(vector<double> point) {
         N->AddHijo(Data);//se entiende que n es una hoja
         Nodo * NN = SplitNodo(N);
         //inserta en N y NN
-
         AdjustTree(N, NN);
         //NN es unido al padre dengro de la funcion adjustTree
     }
@@ -164,7 +211,24 @@ vector<int> XTree::PickSeeds(vector<Nodo*>& Entradas) {
 }
 
 int XTree::PickNext(vector<Nodo*>& Entradas, Nodo * G1, Nodo * G2) {
-    return 0;
+    vector<double> d1s(Entradas.size(), 0);
+    vector<double> d2s(Entradas.size(), 0);
+    int iMax = 0;
+    float dMax = 0;
+    for (int i = 0; i < Entradas.size(); i++) {
+        vector<double> DN;
+        vector<double> DP;
+        ComponerRegion(G1->PointN, G1->PointP, Entradas[i]->PointN, Entradas[i]->PointP, DN, DP);
+        float d1 = AreaRegion(DN, DP) - G1->CoverageArea();
+        ComponerRegion(G2->PointN, G2->PointP, Entradas[i]->PointN, Entradas[i]->PointP, DN, DP);
+        float d2 = AreaRegion(DN, DP) - G2->CoverageArea();
+        float d = abs(d1 - d2);
+        if (d > dMax) {
+            dMax = d;
+            iMax = i;
+        }
+    }
+    return iMax;//retornar el i con la diferencia maxima, ese es el indicie de las entradas que debo escoger como siguiente
 }
 
 void XTree::ComponerRegion(vector<double> & R1N, vector<double> & R1P, vector<double> & R2N, vector<double> & R2P, vector<double>& RN, vector<double>& RP) {//evitar recibir copias

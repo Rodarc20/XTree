@@ -4,10 +4,11 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include "Nodo.h"
 
+using namespace std;
 class LectorArchivos {
     public:
+        vector<vector<double> > ObtenerPuntos();
         LectorArchivos();
         ~LectorArchivos();
 };

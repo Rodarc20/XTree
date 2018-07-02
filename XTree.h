@@ -21,8 +21,11 @@ class XTree {
         int PickNext(vector<Nodo *> & Entradas, Nodo * G1, Nodo * G2);
         void ComponerRegion(vector<double> & R1N, vector<double> & R1P, vector<double> & R2N, vector<double> & R2P, vector<double> & RN, vector<double> & RP);//RN y RP son parametros que son la salida de esta funcion
         double AreaRegion(vector<double> & N, vector<double> & P);//deberia tener usar la clase region
+        double OverlapRegions(vector<double> & N1, vector<double> & P1, vector<double> & N2, vector<double> & P2);
         void Imprimir();
         string Identacion(int Tam);
+
+        Nodo * ChooseSubTree(Nodo * Data);
 
         XTree(int Dimensiones);
         XTree();

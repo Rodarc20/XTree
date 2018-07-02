@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XTree.h"
 #include <limits>
+#include <algorithm>
 
 
 XTree::XTree(int Dimensiones) {
@@ -258,10 +259,101 @@ double XTree::AreaRegion(vector<double> & N, vector<double> & P) {
     return acum;
 }
 
+double XTree::OverlapRegions(vector<double>& N1, vector<double>& P1, vector<double>& N2, vector<double>& P2) {
+    double acum = 1;
+    for (int i = 0; acum && i < Dimensions; i++) {
+        double sobreposicion = min(P1[i], P2[i]) - max(N1[i], N2[i]);
+        if (sobreposicion <= 0) {
+            acum *= 0;
+        }
+        else {
+            acum *= sobreposicion;
+        }
+    }
+    return acum;
+}
+
 void XTree::Imprimir() {
     Root->Imprimir(0);
 }
 
 string XTree::Identacion(int Tam) {
     return string(Tam * 4, ' ');
+}
+
+Nodo * XTree::ChooseSubTree(Nodo * Data) {//no se que hace esto
+    //hay una obtimizacon de esto, implementarla
+    Nodo * N = Root;
+    while (N->bHoja){
+        if (N->Hijos.size()) {//este if es por segurida, debo asegurarme que tiene hijos
+            int iMin = numeric_limits<int>::max();//
+            if (N->Hijos.size() && N->Hijos[0]->bHoja) {//determine the minimun overlap cost
+                double enlargeMin = numeric_limits<double>::max();
+                double areaMin = numeric_limits<double>::max();
+                double overlapMin = numeric_limits<double>::max();
+
+                for (int i = 0; i < N->Hijos.size(); i++) {
+                    //ver que overlap crece menos
+                    vector<double> DN(Dimensions);
+                    vector<double> DP(Dimensions);
+                    ComponerRegion(N->Hijos[i]->PointN, N->Hijos[i]->PointP, Data->PointN, Data->PointP, DN, DP);
+                    //calcular el overlap de esta nueva region, es decir sumar el overlap de esta region con los demas hijos del nodo N, no con respecto a este hijo i, no tendria sentido
+                    double overlap = 0;
+                    for (int j = 0; j < N->Hijos.size(); j++) {
+                        if (j != i) {
+                            overlap += OverlapRegions(DN, DP, N->Hijos[j]->PointN, N->Hijos[j]->PointP);
+                        }
+                    }
+                    double area = AreaRegion(DN, DP);
+                    double enlarge = area - N->Hijos[i]->CoverageArea();
+                    if (overlap < overlapMin) {
+                        iMin = i;
+                        overlap = overlapMin;
+                    }
+                    else if (overlap == overlapMin) {
+                        if (enlarge < enlargeMin) {
+                            iMin = i;
+                            enlargeMin = enlarge;
+                            areaMin = area;
+                        }
+                        else if (enlarge == enlargeMin) {
+                            if (area < areaMin) {
+                                iMin = i;
+                                enlargeMin = enlarge;
+                                areaMin = area;
+                            }
+                        }
+                    }
+                }
+            }
+            else {//los hijos no apuntan a hojas
+                double enlargeMin = numeric_limits<double>::max();
+                double areaMin = numeric_limits<double>::max();
+
+                for (int i = 0; i < N->Hijos.size(); i++) {
+                    //ver que overlap crece menos
+                    vector<double> DN(Dimensions);
+                    vector<double> DP(Dimensions);
+                    ComponerRegion(N->Hijos[i]->PointN, N->Hijos[i]->PointP, Data->PointN, Data->PointP, DN, DP);
+                    //calcular el overlap de esta nueva region, es decir sumar el overlap de esta region con los demas hijos del nodo N, no con respecto a este hijo i, no tendria sentido
+                    double area = AreaRegion(DN, DP);
+                    double enlarge = area - N->Hijos[i]->CoverageArea();
+                    if (enlarge < enlargeMin) {
+                        iMin = i;
+                        enlargeMin = enlarge;
+                        areaMin = area;
+                    }
+                    else if (enlarge == enlargeMin) {
+                        if (area < areaMin) {
+                            iMin = i;
+                            enlargeMin = enlarge;
+                            areaMin = area;
+                        }
+                    }
+                }
+            }
+            N = N->Hijos[iMin];
+        }
+    }
+    return N;
 }

@@ -57,6 +57,14 @@ void Nodo::CalcularCoverage() {
     }
 }
 
+double Nodo::OverlapOf(int k) {
+    double acum = 0.0;
+    for (int i = 0; i < Hijos.size(); i++) {
+
+    }
+    return acum;
+}
+
 bool Nodo::Pertenece(vector<double> p) {
     bool acum = true;
     for (int i = 0; acum && i < PointN.size(); i++) {

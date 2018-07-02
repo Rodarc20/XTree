@@ -6,8 +6,8 @@
 
 XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
-    M = 4;
-    m = 2;
+    M = 20;
+    m = 10;
     Root = nullptr;
 }
 
@@ -121,7 +121,8 @@ void XTree::Insert(vector<double> point) {
         AdjustTree(Root, nullptr);
         return;
     }
-    Nodo * N = ChooseLeaf(Data);//quiza deberia recibir Data para que ese chooseleaf trabaje con rectangulos no con punto
+    //Nodo * N = ChooseLeaf(Data);//quiza deberia recibir Data para que ese chooseleaf trabaje con rectangulos no con punto
+    Nodo * N = ChooseSubTree(Data);//quiza deberia recibir Data para que ese chooseleaf trabaje con rectangulos no con punto
     //add record to leaf
     if (N->Hijos.size() < M) {
         //insertar
@@ -273,6 +274,14 @@ double XTree::OverlapRegions(vector<double>& N1, vector<double>& P1, vector<doub
     return acum;
 }
 
+double XTree::Margen(vector<double>& N, vector<double>& P) {
+    double acum = 0.0;
+    for (int i = 0; i < Dimensions; i++) {
+        acum += P[i] - N[i];
+    }
+    return acum;
+}
+
 void XTree::Imprimir() {
     Root->Imprimir(0);
 }
@@ -356,4 +365,24 @@ Nodo * XTree::ChooseSubTree(Nodo * Data) {//no se que hace esto
         }
     }
     return N;
+}
+
+int XTree::ChooseSplitAxis(Nodo * nodo) {//esta funcion en realida puede hacer split axis y split index a la vez, solo deberian retornar ambos indices
+    //podria retornar el indicde del axis, en el compare axxis, y que esta funcion retorne el indice con el que se parte en dos las entradas.
+    //asi en la fucnion split, llamo a esta funcon, obtengo los indices, y reconstruyo esa distribucion.
+    vector<Nodo *> EntradasN = nodo->Hijos;
+    vector<Nodo *> EntradasP = nodo->Hijos;
+    for (int i = 0; i < Dimensions; i++) {
+        CompareAxis = i;
+        sort(EntradasN.begin(), EntradasN.end(), XTree::CompareEntriesByAxisLower);
+        sort(EntradasP.begin(), EntradasP.end(), XTree::CompareEntriesByAxisUpper);
+    }
+    return 0;
+}
+
+bool XTree::CompareEntriesByAxisLower(Nodo * n1, Nodo * n2) {
+    return n1->PointN[CompareAxis] < n2->PointN[CompareAxis];
+}
+bool XTree::CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2) {
+    return n1->PointP[CompareAxis] < n2->PointP[CompareAxis];
 }

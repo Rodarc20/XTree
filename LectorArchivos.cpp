@@ -10,8 +10,9 @@ vector<vector<double>> LectorArchivos::ObtenerPuntos() {
     std::ifstream myfile ("D:/UCSP/EDA/DataSets/YearPredictionMSD/YearPredictionMSD.txt");
     //std::ifstream myfile ("D:/UCSP/TareasUCSP_ws/TareasUCSP/EDA/QuadTreeVisualization/crime50k3.csv");
     //archivos de prueba, esot no requiere la covnersion posterior a
+    int count = 0;
     if (myfile.is_open()) {
-        while ( getline (myfile,line) ) {
+        while ( getline (myfile,line) && count < 10000) {
             //cout << line << endl;
             vector<string> split;
             int inicio = 0;
@@ -31,6 +32,10 @@ vector<vector<double>> LectorArchivos::ObtenerPuntos() {
                 p[j] = stof(split[j]);
             }
             res.push_back(p);
+            count++;
+            if (!(count % 1000)) {
+                cout << count << " registro leidos." << endl;
+            }
         }
         myfile.close();
     }

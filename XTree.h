@@ -23,17 +23,16 @@ class XTree {
         double AreaRegion(vector<double> & N, vector<double> & P);//deberia tener usar la clase region
         double OverlapRegions(vector<double> & N1, vector<double> & P1, vector<double> & N2, vector<double> & P2);
         double Margen(vector<double> & N, vector<double> & P);//margen de una region
+        void CalcularCoverage(vector<Nodo*>& Entradas, int ini, int fin, vector<double>& N, vector<double>& P);//N y P son las asalidas de esta fucnion
         void Imprimir();
         string Identacion(int Tam);
 
         Nodo * ChooseSubTree(Nodo * Data);
         int ChooseSplitAxis(Nodo * nodo);// devuel el el inidice de la dimension sobre el cual se dividira
+        int ChooseSplitIndex(Nodo * nodo, int axis);//eje sobre el cual se buscara el indice de particion, en este caso retornara K, el ultimo indice del primero grupo, 
         int CompareAxis;
         bool CompareEntriesByAxisLower(Nodo * n1, Nodo * n2);
         bool CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2);
-
-        void CalcularCoverage(vector<Nodo*>& Entradas, int ini, int fin, vector<double>& N, vector<double>& P);
-
         XTree(int Dimensiones);
         XTree();
         ~XTree();

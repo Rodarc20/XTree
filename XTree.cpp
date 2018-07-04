@@ -407,6 +407,66 @@ int XTree::ChooseSplitAxis(Nodo * nodo) {//esta funcion en realida puede hacer s
     return axisMin;
 }
 
+int XTree::ChooseSplitIndex(Nodo * nodo, int axis) {
+    vector<Nodo *> EntradasN = nodo->Hijos;
+    vector<Nodo *> EntradasP = nodo->Hijos;
+    //copiadas las entradas para relaizar los ordenamientos
+    double OverlapMin = numeric_limits<double>::max();
+    double AreaMin = numeric_limits<double>::max();
+    //smin sera tomar el margin minimo
+    double idMin = 0;
+
+    CompareAxis = axis;//con esto controlo el eje con el que se ordena
+    sort(EntradasN.begin(), EntradasN.end(), XTree::CompareEntriesByAxisLower);
+    sort(EntradasP.begin(), EntradasP.end(), XTree::CompareEntriesByAxisUpper);
+    //o esto en realida es que ponga como primer criterio el N y luego el P, para hacer un solo ordenamiento
+    //se ordenan para cada axis, 
+    //revisar que este for este correcto
+    vector<double> G1N (Dimensions, 0);
+    vector<double> G1P (Dimensions, 0);
+    vector<double> G2N (Dimensions, 0);
+    vector<double> G2P (Dimensions, 0);
+    double OverlapValue = 0;
+    double AreaValue = 0;
+    for (int k = m-1; k < nodo->Hijos.size()-m; k++) {//m es 4 tomar 4, entcones para tomar los primeros m debo tener k = 3
+        //primer grupo de 0 a k
+        //segundo grupo de k+1 hasta el indice Hijos.size()-1
+        CalcularCoverage(EntradasN, 0, k, G1N, G1P);
+        CalcularCoverage(EntradasN, k+1, EntradasN.size()-1, G2N, G2P);
+        OverlapValue = OverlapRegions(G1N, G1P, G2N, G2P);
+        AreaValue = AreaRegion(G1N, G1P) + AreaRegion(G2N, G2P);
+        if (OverlapValue < OverlapMin) {
+            OverlapMin = OverlapValue;
+            AreaMin = AreaValue;
+            idMin = k;//la pregnta es coo le digo en que ordamiento fue?
+        }
+        else if (OverlapValue == OverlapMin) {
+            if (AreaValue < AreaMin) {
+                OverlapMin = OverlapValue;
+                AreaMin = AreaValue;
+                idMin = k;//la pregnta es coo le digo en que ordamiento fue?
+            }
+        }
+        CalcularCoverage(EntradasP, 0, k, G1N, G1P);
+        CalcularCoverage(EntradasP, k+1, EntradasP.size()-1, G2N, G2P);
+        OverlapValue = OverlapRegions(G1N, G1P, G2N, G2P);
+        AreaValue = AreaRegion(G1N, G1P) + AreaRegion(G2N, G2P);
+        if (OverlapValue < OverlapMin) {
+            OverlapMin = OverlapValue;
+            AreaMin = AreaValue;
+            idMin = k;//la pregnta es coo le digo en que ordamiento fue?
+        }
+        else if (OverlapValue == OverlapMin) {
+            if (AreaValue < AreaMin) {
+                OverlapMin = OverlapValue;
+                AreaMin = AreaValue;
+                idMin = k;//la pregnta es coo le digo en que ordamiento fue?
+            }
+        }
+    }
+    return idMin;
+}
+
 bool XTree::CompareEntriesByAxisLower(Nodo * n1, Nodo * n2) {
     return n1->PointN[CompareAxis] < n2->PointN[CompareAxis];
 }

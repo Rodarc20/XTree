@@ -32,6 +32,8 @@ class XTree {
         bool CompareEntriesByAxisLower(Nodo * n1, Nodo * n2);
         bool CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2);
 
+        void CalcularCoverage(vector<Nodo*>& Entradas, int ini, int fin, vector<double>& N, vector<double>& P);
+
         XTree(int Dimensiones);
         XTree();
         ~XTree();

@@ -370,14 +370,41 @@ Nodo * XTree::ChooseSubTree(Nodo * Data) {//no se que hace esto
 int XTree::ChooseSplitAxis(Nodo * nodo) {//esta funcion en realida puede hacer split axis y split index a la vez, solo deberian retornar ambos indices
     //podria retornar el indicde del axis, en el compare axxis, y que esta funcion retorne el indice con el que se parte en dos las entradas.
     //asi en la fucnion split, llamo a esta funcon, obtengo los indices, y reconstruyo esa distribucion.
+    //tal vez deberia incluir el nodo a isnsetar, aun que creo que ya deberia estar insertado
+    //se supone que esta funcion se llama dentro del split, por lo tanto si se ha llamado a esplit queire decir que el nodo ha excedido M, ose tiene M+1 hijos
     vector<Nodo *> EntradasN = nodo->Hijos;
     vector<Nodo *> EntradasP = nodo->Hijos;
+    //copiadas las entradas para relaizar los ordenamientos
+    double SMin = numeric_limits<double>::max();
+    //smin sera tomar el margin minimo
+    double axisMin = 0;
     for (int i = 0; i < Dimensions; i++) {
-        CompareAxis = i;
+        CompareAxis = i;//con esto controlo el eje con el que se ordena
         sort(EntradasN.begin(), EntradasN.end(), XTree::CompareEntriesByAxisLower);
         sort(EntradasP.begin(), EntradasP.end(), XTree::CompareEntriesByAxisUpper);
+        //se ordenan para cada axis, 
+        //revisar que este for este correcto
+        vector<double> G1N (Dimensions, 0);
+        vector<double> G1P (Dimensions, 0);
+        vector<double> G2N (Dimensions, 0);
+        vector<double> G2P (Dimensions, 0);
+        double S = 0;
+        for (int k = m-1; k < nodo->Hijos.size()-m; k++) {//m es 4 tomar 4, entcones para tomar los primeros m debo tener k = 3
+            //primer grupo de 0 a k
+            //segundo grupo de k+1 hasta el indice Hijos.size()-1
+            CalcularCoverage(EntradasN, 0, k, G1N, G1P);
+            CalcularCoverage(EntradasN, k+1, EntradasN.size()-1, G2N, G2P);
+            S += Margen(G1N, G1P) + Margen(G2N, G2P);
+            CalcularCoverage(EntradasP, 0, k, G1N, G1P);
+            CalcularCoverage(EntradasP, k+1, EntradasP.size()-1, G2N, G2P);
+            S += Margen(G1N, G1P) + Margen(G2N, G2P);
+        }
+        if (S < SMin) {
+            SMin = S;
+            axisMin = i;
+        }
     }
-    return 0;
+    return axisMin;
 }
 
 bool XTree::CompareEntriesByAxisLower(Nodo * n1, Nodo * n2) {
@@ -385,4 +412,23 @@ bool XTree::CompareEntriesByAxisLower(Nodo * n1, Nodo * n2) {
 }
 bool XTree::CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2) {
     return n1->PointP[CompareAxis] < n2->PointP[CompareAxis];
+}
+
+void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector<double> & N, vector<double> & P) {//inicio y final 
+    //calcular el coverage de un determinado grupo de un vector de entradas
+    if (Entradas.size()) {
+        N = Entradas[0]->PointN;
+        P = Entradas[0]->PointP;
+    }
+    for (int i = ini; i <= fin; i++) {
+        //actualizar mis PointLU y PoinrRB, con lso minimos y maximos que correspondadn
+        for (int j = 0; j < N.size(); j++) {//esto es para avanzar en el numero de dimensiones de los vectores, tal vez deberia almacenalo en alguna variable
+            if (Entradas[i]->PointN[j] < N[j]) {
+                N[j] = Entradas[i]->PointN[j];
+            }
+            if (Entradas[i]->PointP[j] > P[j]) {
+                P[j] = Entradas[i]->PointP[j];
+            }
+        }
+    }
 }

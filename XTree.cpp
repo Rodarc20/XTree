@@ -63,52 +63,29 @@ Nodo * XTree::ChooseLeaf(Nodo * Data) {
 }
 
 Nodo * XTree::SplitNodo(Nodo * nodo) {
-    vector<int> seeds = PickSeeds(nodo->Hijos);
-    vector<Nodo *> EntradasRestantes = nodo->Hijos;
-    Nodo * G1 = nodo->Hijos[seeds[0]];
-    Nodo * G2 = nodo->Hijos[seeds[1]];
-    nodo->Hijos.clear();
-    nodo->CalcularCoverage();
+
+    int axis = ChooseSplitAxis(nodo);
+    int index = ChooseSplitIndex(nodo, axis);
+    //
     Nodo * NN = new Nodo();
     NN->bHoja = nodo->bHoja;
-    nodo->AddHijo(G1);
-    NN->AddHijo(G2);
-    NN->CalcularCoverage();
-    EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), G1));
-    EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), G2));
-    while (!EntradasRestantes.empty()) {
-        //falta un if aqui, segun el paper, es uno que conrtola que ambos grupos tenga el minimo
-        int next = PickNext(EntradasRestantes, nodo, NN);
-        Nodo * nodonext = EntradasRestantes[next];
-        //ver que area crece mas
-        vector<double> DN (Dimensions);
-        vector<double> DP (Dimensions);
-        ComponerRegion(nodo->PointN, nodo->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
-        double area1 = AreaRegion(DN, DP);
-        double d1 = area1 - nodo->CoverageArea();
-        ComponerRegion(NN->PointN, NN->PointP, nodonext->PointN, nodonext->PointP, DN, DP);
-        double area2 = AreaRegion(DN, DP);
-        double d2 = area2 - NN->CoverageArea();
-        if (d1 < d2) {
-            nodo->AddHijo(nodonext);
-            nodo->CalcularCoverage();
-        }
-        else if (d2 < d1) {
-            NN->AddHijo(nodonext);
-            NN->CalcularCoverage();
-        }
-        else{
-            if (area1 < area2) {
-                nodo->AddHijo(nodonext);
-                nodo->CalcularCoverage();
-            }
-            else {
-                NN->AddHijo(nodonext);
-                NN->CalcularCoverage();
-            }
-        }
-        EntradasRestantes.erase(find(EntradasRestantes.begin(), EntradasRestantes.end(), nodonext));
+
+    //reconstruir la distribucion a partir de axis e index
+    vector<Nodo *> Entradas = nodo->Hijos;//
+    //copiadas las entradas para relaizar los ordenamientos
+    CompareAxis = axis;//con esto controlo el eje con el que se ordena
+    sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisLower);//por ahora tomare el sor de lowwer
+    //sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisUpper);//por ahora tomare el sor de lowwer
+    nodo->Hijos.clear();
+    for (int i = 0; i <= axis && i < Entradas.size(); i++) {
+        nodo->AddHijo(Entradas[i]);
     }
+    for (int i = axis+1; i < Entradas.size(); i++) {
+        NN->AddHijo(Entradas[i]);
+    }
+    nodo->CalcularCoverage();
+    NN->CalcularCoverage();
+
     return NN;
 }
 

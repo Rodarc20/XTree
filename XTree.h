@@ -33,6 +33,12 @@ class XTree {
         int CompareAxis;
         bool CompareEntriesByAxisLower(Nodo * & n1, Nodo * & n2);
         bool CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2);
+
+        double Distancia(vector<double> & p, vector<double> & q);
+        bool Find(vector<double> & p);
+        vector<vector<double> > Range(vector<double> & p, double distancia);
+        vector<vector<double> > KNN(vector<double> & p, int k);
+
         XTree(int Dimensiones);
         XTree();
         ~XTree();

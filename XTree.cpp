@@ -468,6 +468,22 @@ bool XTree::CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
     return n1->PointP[CompareAxis] < n2->PointP[CompareAxis];
 }
 
+double XTree::Distancia(vector<double>& p, vector<double>& q) {
+    return 0.0;
+}
+
+bool XTree::Find(vector<double>& p) {
+    return false;
+}
+
+vector<vector<double>> XTree::Range(vector<double>& p, double distancia) {
+    return vector<vector<double>>();
+}
+
+vector<vector<double>> XTree::KNN(vector<double>& p, int k) {
+    return vector<vector<double>>();
+}
+
 void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector<double> & N, vector<double> & P) {//inicio y final 
     //calcular el coverage de un determinado grupo de un vector de entradas
     if (Entradas.size()) {

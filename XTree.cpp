@@ -495,6 +495,13 @@ bool XTree::Find(vector<double> & p, Nodo * nodo) {
 }
 
 vector<vector<double>> XTree::Range(vector<double>& p, double distancia) {
+    //idea basica
+    vector<double> pN = p;
+    vector<double> pP = p;
+    for (int i = 0; i < Dimensions; i++) {
+        pN[i] -= distancia;
+        pP[i] += distancia;
+    }
     return vector<vector<double>>();
 }
 
@@ -519,6 +526,14 @@ void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector
             }
         }
     }
+}
+
+int XTree::TypeOfOverlap(vector<double>& R1N, vector<double>& R1P, vector<double>& R2N, vector<double>& R2P) {
+    //0 si no hay interseccion
+    //1 si hay alguna interseccion
+    //2 si R1 esta dentro de R2, R1 es mas grade
+   //3 si R2 esta dentro de R1, o lo que mismo, R1 es mas pequeña que R2
+    return 0;
 }
 
 

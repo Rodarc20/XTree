@@ -40,6 +40,7 @@ class XTree {
         vector<vector<double> > Range(vector<double> & p, double distancia);
         vector<vector<double> > KNN(vector<double> & p, int k);
 
+        int TypeOfOverlap(vector<double> & R1N, vector<double> & R1P, vector<double> & R2N, vector<double> & R2P);
         XTree(int Dimensiones);
         XTree();
         ~XTree();

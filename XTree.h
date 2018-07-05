@@ -31,8 +31,8 @@ class XTree {
         int ChooseSplitAxis(Nodo * nodo);// devuel el el inidice de la dimension sobre el cual se dividira
         int ChooseSplitIndex(Nodo * nodo, int axis);//eje sobre el cual se buscara el indice de particion, en este caso retornara K, el ultimo indice del primero grupo, 
         int CompareAxis;
-        bool CompareEntriesByAxisLower(Nodo * n1, Nodo * n2);
-        bool CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2);
+        bool CompareEntriesByAxisLower(Nodo * & n1, Nodo * & n2);
+        bool CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2);
         XTree(int Dimensiones);
         XTree();
         ~XTree();

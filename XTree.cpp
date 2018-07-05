@@ -3,11 +3,21 @@
 #include <limits>
 #include <algorithm>
 
+int ComAxis = 0;
+
+bool CompEntriesByAxisLower(Nodo * & n1, Nodo * & n2) {
+    return n1->PointN[ComAxis] < n2->PointN[ComAxis];
+}
+bool CompEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
+    return n1->PointP[ComAxis] < n2->PointP[ComAxis];
+}
 
 XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
-    M = 20;
-    m = 10;
+    //M = 20;
+    //m = 10;
+    M = 6;
+    m = 2;
     Root = nullptr;
 }
 
@@ -17,7 +27,6 @@ XTree::XTree() {
     m = 2;
     Root = nullptr;
 }
-
 
 XTree::~XTree() {
 }
@@ -74,7 +83,9 @@ Nodo * XTree::SplitNodo(Nodo * nodo) {
     vector<Nodo *> Entradas = nodo->Hijos;//
     //copiadas las entradas para relaizar los ordenamientos
     CompareAxis = axis;//con esto controlo el eje con el que se ordena
-    sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisLower);//por ahora tomare el sor de lowwer
+    ComAxis = axis;//con esto controlo el eje con el que se ordena
+    sort(Entradas.begin(), Entradas.end(), CompEntriesByAxisLower);//por ahora tomare el sor de lowwer
+    //sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisLower);//por ahora tomare el sor de lowwer
     //sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisUpper);//por ahora tomare el sor de lowwer
     nodo->Hijos.clear();
     for (int i = 0; i <= axis && i < Entradas.size(); i++) {
@@ -270,7 +281,7 @@ string XTree::Identacion(int Tam) {
 Nodo * XTree::ChooseSubTree(Nodo * Data) {//no se que hace esto
     //hay una obtimizacon de esto, implementarla
     Nodo * N = Root;
-    while (N->bHoja){
+    while (!N->bHoja){
         if (N->Hijos.size()) {//este if es por segurida, debo asegurarme que tiene hijos
             int iMin = numeric_limits<int>::max();//
             if (N->Hijos.size() && N->Hijos[0]->bHoja) {//determine the minimun overlap cost
@@ -354,11 +365,14 @@ int XTree::ChooseSplitAxis(Nodo * nodo) {//esta funcion en realida puede hacer s
     //copiadas las entradas para relaizar los ordenamientos
     double SMin = numeric_limits<double>::max();
     //smin sera tomar el margin minimo
-    double axisMin = 0;
+    int axisMin = 0;
     for (int i = 0; i < Dimensions; i++) {
         CompareAxis = i;//con esto controlo el eje con el que se ordena
-        sort(EntradasN.begin(), EntradasN.end(), XTree::CompareEntriesByAxisLower);
-        sort(EntradasP.begin(), EntradasP.end(), XTree::CompareEntriesByAxisUpper);
+        ComAxis = i;
+        sort(EntradasN.begin(), EntradasN.end(), CompEntriesByAxisLower);
+        sort(EntradasP.begin(), EntradasP.end(), CompEntriesByAxisUpper);
+        //sort(EntradasN.begin(), EntradasN.end(), &XTree::CompareEntriesByAxisLower);
+        //sort(EntradasP.begin(), EntradasP.end(), &XTree::CompareEntriesByAxisUpper);
         //se ordenan para cada axis, 
         //revisar que este for este correcto
         vector<double> G1N (Dimensions, 0);
@@ -391,11 +405,14 @@ int XTree::ChooseSplitIndex(Nodo * nodo, int axis) {
     double OverlapMin = numeric_limits<double>::max();
     double AreaMin = numeric_limits<double>::max();
     //smin sera tomar el margin minimo
-    double idMin = 0;
+    int idMin = 0;
 
     CompareAxis = axis;//con esto controlo el eje con el que se ordena
-    sort(EntradasN.begin(), EntradasN.end(), XTree::CompareEntriesByAxisLower);
-    sort(EntradasP.begin(), EntradasP.end(), XTree::CompareEntriesByAxisUpper);
+    ComAxis = axis;
+    //sort(EntradasN.begin(), EntradasN.end(), &XTree::CompareEntriesByAxisLower);
+    //sort(EntradasP.begin(), EntradasP.end(), &XTree::CompareEntriesByAxisUpper);
+    sort(EntradasN.begin(), EntradasN.end(), CompEntriesByAxisLower);
+    sort(EntradasP.begin(), EntradasP.end(), CompEntriesByAxisUpper);
     //o esto en realida es que ponga como primer criterio el N y luego el P, para hacer un solo ordenamiento
     //se ordenan para cada axis, 
     //revisar que este for este correcto
@@ -444,10 +461,10 @@ int XTree::ChooseSplitIndex(Nodo * nodo, int axis) {
     return idMin;
 }
 
-bool XTree::CompareEntriesByAxisLower(Nodo * n1, Nodo * n2) {
+bool XTree::CompareEntriesByAxisLower(Nodo * & n1, Nodo * & n2) {
     return n1->PointN[CompareAxis] < n2->PointN[CompareAxis];
 }
-bool XTree::CompareEntriesByAxisUpper(Nodo * n1, Nodo * n2) {
+bool XTree::CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
     return n1->PointP[CompareAxis] < n2->PointP[CompareAxis];
 }
 

@@ -15,10 +15,10 @@ bool CompEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
 
 XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
-    M = 20;
-    m = 8;
-    //M = 5;
-    //m = 2;
+    //M = 20;
+    //m = 8;
+    M = 5;
+    m = 2;
     Root = nullptr;
 }
 
@@ -470,7 +470,7 @@ bool XTree::CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
 }
 
 double XTree::Distancia(vector<double>& p, vector<double>& q) {
-    float acum = 0;
+    double acum = 0;
     for(int i = 0; i < Dimensions; i++){
         acum += pow(p[i]-q[i], 2);
     }
@@ -479,7 +479,19 @@ double XTree::Distancia(vector<double>& p, vector<double>& q) {
 }
 
 bool XTree::Find(vector<double>& p) {
-    return false;
+    return Find(p, Root);
+}
+
+bool XTree::Find(vector<double> & p, Nodo * nodo) {
+    bool res = false;
+    if (nodo->bDataPoint)
+        return nodo->DataPoint == p;
+    for (int i = 0; i < nodo->Hijos.size(); i++) {
+        if (nodo->Hijos[i]->Pertenece(p)) {
+            res |= Find(p, nodo->Hijos[i]);
+        }
+    }
+    return res;
 }
 
 vector<vector<double>> XTree::Range(vector<double>& p, double distancia) {

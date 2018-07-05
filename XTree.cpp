@@ -2,6 +2,7 @@
 #include "XTree.h"
 #include <limits>
 #include <algorithm>
+#include <math.h>
 
 int ComAxis = 0;
 
@@ -469,7 +470,12 @@ bool XTree::CompareEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
 }
 
 double XTree::Distancia(vector<double>& p, vector<double>& q) {
-    return 0.0;
+    float acum = 0;
+    for(int i = 0; i < Dimensions; i++){
+        acum += pow(p[i]-q[i], 2);
+    }
+    //esta funcion de distancia podria ser muy costosa, y tambien podria desbordar, ver como reducir
+    return sqrt(acum);
 }
 
 bool XTree::Find(vector<double>& p) {

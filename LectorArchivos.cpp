@@ -12,7 +12,7 @@ vector<vector<double>> LectorArchivos::ObtenerPuntos() {
     //archivos de prueba, esot no requiere la covnersion posterior a
     int count = 0;
     if (myfile.is_open()) {
-        while ( getline (myfile,line) && count < 10000) {
+        while ( getline (myfile,line) && count < 1000) {
             //cout << line << endl;
             vector<string> split;
             int inicio = 0;

@@ -14,10 +14,10 @@ bool CompEntriesByAxisUpper(Nodo * & n1, Nodo * & n2) {
 
 XTree::XTree(int Dimensiones) {
     Dimensions = Dimensiones;
-    //M = 20;
-    //m = 10;
-    M = 6;
-    m = 2;
+    M = 20;
+    m = 8;
+    //M = 5;
+    //m = 2;
     Root = nullptr;
 }
 
@@ -88,10 +88,10 @@ Nodo * XTree::SplitNodo(Nodo * nodo) {
     //sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisLower);//por ahora tomare el sor de lowwer
     //sort(Entradas.begin(), Entradas.end(), XTree::CompareEntriesByAxisUpper);//por ahora tomare el sor de lowwer
     nodo->Hijos.clear();
-    for (int i = 0; i <= axis && i < Entradas.size(); i++) {
+    for (int i = 0; i <= index && i < Entradas.size(); i++) {
         nodo->AddHijo(Entradas[i]);
     }
-    for (int i = axis+1; i < Entradas.size(); i++) {
+    for (int i = index+1; i < Entradas.size(); i++) {
         NN->AddHijo(Entradas[i]);
     }
     nodo->CalcularCoverage();
@@ -486,3 +486,16 @@ void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector
         }
     }
 }
+
+
+//para las busquedas
+
+//en el cso de las knn, debo buscar la hoja a la que pertenece el punto
+//luego buscar los similares entre las entradas de esa hoja, que se supone son los mas cercanos.
+//de no haber los suficientes, subir un nivel y buscar en los hemanos de esa hoja, y asi recursivamente hacia la raiz
+//debo santes de cada niverl obtener los simialres en cada hermano y los resultatnes oredenarlos por similaridad con lo que busco, me quedo con lo que encesite
+//se supone que mientas vo subiendo voy obteniendo entradas,  por lo tanto en los hermanos necesito buscar menos numero de entradas, la busqueda auiq es obtener uesa cantidad faltante.
+// como todos los hermanos me dan esa cantidad debo, ordenar y quedarme ocn los mas similares.
+//el problema es el overlap en las regiones, es posible que haya nodos que no devuelva por que estaban en un hermano muy alejado en el arbol, pero que est muy cerca a lo que busco?
+
+//para la busqueda de rango. solo debo buscar en las regiones que se intersectan, seguir las ideas de mi cabeza

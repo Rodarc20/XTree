@@ -528,12 +528,63 @@ void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector
     }
 }
 
+int XTree::TypeOfOverlapDimension(double & R1ND, double & R1PD, double & R2ND, double & R2PD) {
+    //0 si no hay interseccion
+    //1 si hay alguna interseccion
+    //2 si R1 esta dentro de R2, R1 es mas grade
+    //3 si R2 esta dentro de R1, o lo que mismo, R1 es mas pequeña que R2
+    // en el que caso de que las regiones sean giuales, R1 sera siempre "mas grande"que R2, esto ya que estoy usando R! como criterio de busqueda entonces quiero que cuando sean iguales todo R2 sea tomado en cuenta y ya no tenga que revisar en sus hijos si hay overlap o no
+    // este ultimo criterio tambien debe ser plicado dimension por dimension
+    int TypeOverlap;
+    if (R1ND <= R2ND) {
+        if (R2ND <= R1PD) {
+            if (R1PD < R2PD) {
+                TypeOverlap = 1;
+            }
+            else {
+                TypeOverlap = 3;
+            }
+        }
+        else {//R2ND >= R1PD
+            TypeOverlap = 0;
+        }
+    }
+    else {// R2ND < R1ND
+        if (R1ND <= R2PD) {
+            if (R2PD < R1PD) {
+                TypeOverlap = 1;
+            }
+            else {
+                TypeOverlap = 2;
+            }
+        }
+        else {
+            TypeOverlap = 0;
+        }
+    }
+    return TypeOverlap;
+}
+
 int XTree::TypeOfOverlap(vector<double>& R1N, vector<double>& R1P, vector<double>& R2N, vector<double>& R2P) {
     //0 si no hay interseccion
     //1 si hay alguna interseccion
     //2 si R1 esta dentro de R2, R1 es mas grade
-   //3 si R2 esta dentro de R1, o lo que mismo, R1 es mas pequeña que R2
-    return 0;
+    //3 si R2 esta dentro de R1, o lo que mismo, R1 es mas pequeña que R2
+    int TypeOverlapDimension = TypeOfOverlapDimension(R1N[0], R1P[0], R2N[0], R2P[0]);
+    int TypeOverlap = TypeOverlapDimension;
+    for (int i = 1; TypeOverlap && i < Dimensions; i++) {
+        TypeOverlapDimension = TypeOfOverlapDimension(R1N[i], R1P[i], R2N[i], R2P[i]);
+        if (TypeOverlap == 3 && TypeOverlapDimension == 2) {
+            TypeOverlap = 1;
+        }
+        else if (TypeOverlap == 2 && TypeOverlapDimension == 3) {
+            TypeOverlap = 1;
+        }
+        else {
+            TypeOverlap = min(TypeOverlap, TypeOverlapDimension);
+        }
+    }
+    return TypeOverlap;
 }
 
 

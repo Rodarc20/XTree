@@ -38,7 +38,11 @@ class XTree {
         bool Find(vector<double> & p);
         bool Find(vector<double>& p, Nodo * nodo);
         vector<vector<double> > Range(vector<double> & p, double distancia);
+        vector<vector<double> > Range(Nodo * nodo, vector<double> & p, double distancia, vector<double> & pN, vector<double> & pP);
+        vector<vector<double>> AllEntries(Nodo * nodo);
         vector<vector<double> > KNN(vector<double> & p, int k);
+
+        bool Pertenece(vector<double>& p, vector<double>& RN, vector<double>& RP);
 
         int TypeOfOverlapDimension(double & R1ND, double & R1PD, double & R2ND, double & R2PD);
         int TypeOfOverlap(vector<double> & R1N, vector<double> & R1P, vector<double> & R2N, vector<double> & R2P);

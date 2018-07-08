@@ -65,7 +65,7 @@ double Nodo::OverlapOf(int k) {
     return acum;
 }
 
-bool Nodo::Pertenece(vector<double> p) {
+bool Nodo::Pertenece(vector<double> & p) {
     bool acum = true;
     for (int i = 0; acum && i < PointN.size(); i++) {
         acum &= PointN[i] <= p[i] && p[i] <= PointP[i];

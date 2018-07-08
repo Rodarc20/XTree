@@ -18,7 +18,7 @@ class Nodo {
         double CoverageArea();
         void CalcularCoverage();
         double OverlapOf(int k);//overlap de la entrada 
-        bool Pertenece(vector<double> p);
+        bool Pertenece(vector<double> & p);
         void AddHijo(Nodo * hijo);
         void Imprimir(int iden);
         string Identacion(int Tam);

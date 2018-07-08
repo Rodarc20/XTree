@@ -3,6 +3,7 @@
 #include <limits>
 #include <algorithm>
 #include <math.h>
+#include <queue>
 
 int ComAxis = 0;
 
@@ -502,11 +503,86 @@ vector<vector<double>> XTree::Range(vector<double>& p, double distancia) {
         pN[i] -= distancia;
         pP[i] += distancia;
     }
-    return vector<vector<double>>();
+    return Range(Root, p, distancia, pN, pP);
+}
+
+vector<vector<double>> XTree::Range(Nodo * nodo, vector<double>& p, double distancia, vector<double> & pN, vector<double> & pP) {
+    //idea basica
+    //deberia ya recivir esto o no? ya que igual tengo que ir filtrando los resultados, a mendid que entro en cada nodo, o que llego a las hojas
+    //deberia hacer antes o depues la comprobacion del tipo?
+    //antes seria mejor comproar el tipo de overlap que hacer, cuando entro solo es buscar que entradas cumplen, y en caso de ser hoja devolcer los datos que esten en el rango especificol
+    int TypeOverlap = TypeOfOverlap(pN, pP, nodo->PointN, nodo->PointP);
+    //y en el caso de que sea hoja?//si entro a qui por que entro?, debo verificar que este dentro del rango ese, que pertenezca alli
+    if (nodo->bDataPoint) {
+        if (Pertenece(nodo->DataPoint, pN, pP) && Distancia(p, nodo->DataPoint) <= distancia) {
+            vector<vector<double>> res;
+            res.push_back(nodo->DataPoint);
+            return res;
+        }
+    }
+    //no es un data point debo buscar en sus hijos
+    if (TypeOverlap == 3) {
+        //devolver todo
+        //llamar al afuncion get tipe y devolver a todos los que cumplan con el randgo de distancia, seta funcion evitara hacer comprovaciones de TypeOfOverlap
+        vector<vector<double> > r = AllEntries(nodo);
+        vector<vector<double>> res;
+        //aqui si debo verificarla distancia
+        for (int i = 0; i < r.size(); i++) {
+            if (Distancia(p, r[i]) <= distancia) {
+                res.push_back(r[i]);
+            }
+        }
+        return res;
+    }
+    else if (TypeOverlap){//hay intercion con la buscqueda o la busqueda esta dentro de del nodo
+       //buscar los hijos ocn los que me solapo y llamo a la funcion rango
+        vector<vector<double>> res;
+        for (int i = 0; i < Root->Hijos.size(); i++) {
+            //llamar defrente a Range sobre los hojos, y sumar sus resultados en caso de que tengan
+            vector<vector<double> > r = Range(Root->Hijos[i], p, distancia, pN, pP);
+            for (int i = 0; i < r.size(); i++) {//esto deberia estar aqui??
+                res.push_back(r[i]);//ya se han devuelto tomando en cuenta la distancia
+            }
+        }
+        return res;
+    }
+    else {
+        //devolver vacon no hay ningun overla
+        //no devolver nada devolver uno vacio
+        return vector<vector<double>>();
+    }
+}
+
+vector<vector<double>> XTree::AllEntries(Nodo * nodo) {
+    //hacer una busqueda en anchira y devolver todos los datapoints;
+    vector<vector<double>> res;
+    queue<Nodo *> cola;
+    cola.push(nodo);
+    while (!cola.empty()) {
+        Nodo * n = cola.front();
+        cola.pop();
+        if (n->bDataPoint) {
+            res.push_back(n->DataPoint);
+        }
+        else {
+            for (int i = 0; i < n->Hijos.size(); i++) {
+                cola.push(n->Hijos[i]);
+            }
+        }
+    }
+    return res;
 }
 
 vector<vector<double>> XTree::KNN(vector<double>& p, int k) {
     return vector<vector<double>>();
+}
+
+bool XTree::Pertenece(vector<double> & p, vector<double> & RN, vector<double> & RP) {
+    bool acum = true;
+    for (int i = 0; acum && i < Dimensions; i++) {
+        acum &= RN[i] <= p[i] && p[i] <= RP[i];
+    }
+    return acum;
 }
 
 void XTree::CalcularCoverage(vector<Nodo *> & Entradas, int ini, int fin, vector<double> & N, vector<double> & P) {//inicio y final 

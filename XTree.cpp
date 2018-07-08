@@ -537,9 +537,9 @@ vector<vector<double>> XTree::Range(Nodo * nodo, vector<double>& p, double dista
     else if (TypeOverlap){//hay intercion con la buscqueda o la busqueda esta dentro de del nodo
        //buscar los hijos ocn los que me solapo y llamo a la funcion rango
         vector<vector<double>> res;
-        for (int i = 0; i < Root->Hijos.size(); i++) {
+        for (int i = 0; i < nodo->Hijos.size(); i++) {
             //llamar defrente a Range sobre los hojos, y sumar sus resultados en caso de que tengan
-            vector<vector<double> > r = Range(Root->Hijos[i], p, distancia, pN, pP);
+            vector<vector<double> > r = Range(nodo->Hijos[i], p, distancia, pN, pP);
             for (int i = 0; i < r.size(); i++) {//esto deberia estar aqui??
                 res.push_back(r[i]);//ya se han devuelto tomando en cuenta la distancia
             }

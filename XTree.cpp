@@ -25,10 +25,11 @@ double MinDist(vector<double> & punto, vector<double> & n, vector<double> & p) {
     }
     return sqrt(acum);
 }
+
 bool CompNodosKnn(Nodo * n1, Nodo * n2) {
-    //return MinDist(referencia, )
-    return true;
+    return MinDist(referencia, n1->PointN, n1->PointP) < MinDist(referencia, n2->PointN, n2->PointP);
 }
+
 double Distancia(vector<double>& p, vector<double>& q) {
     double acum = 0;
     for(int i = 0; i < p.size(); i++){
@@ -612,26 +613,23 @@ vector<vector<double>> XTree::KNN(vector<double>& p, int k) {
     vector<vector<double>> res;
     //buscar la hojas a las que pertenezca el puneto
     referencia = p;
-    vector<Nodo *> Explorar = EncontrarHojas(p);
+    vector<Nodo *> Explorar;
+    Explorar.push_back(Root);
     vector<Nodo *> Explorar2;
-    while (res.size() < k) {
-        for (int i = 0; i < Explorar.size(); i++) {
-            for (int j = 0; j < Explorar[i]->Hijos.size(); j++) {
-                if (!Explorar[i]->Hijos[j]->bVisitado) {
-                    vector<vector<double>> puntos = AllEntries(Explorar[i]->Hijos[i]);
-                    for (int j = 0; j < puntos.size(); j++) {
-                        res.push_back(puntos[i]);
-                    }
+    while (res.size() < k && Explorar.size()) {
+        int vueltas = Explorar.size();
+        for (int i = 0; i < vueltas; i++) {
+            if (Explorar[0]->bDataPoint) {
+                res.push_back(Explorar[0]->DataPoint);
+            }
+            else {
+                for (int j = 0; j < Explorar[0]->Hijos.size(); j++) {
+                    Explorar.push_back(Explorar[0]->Hijos[j]);
                 }
             }
-            Explorar[i]->bVisitado = true;
+            Explorar.erase(Explorar.begin());
         }
-        for (int i = 0; Explorar.size(); i++) {
-            vector<Nodo *>::iterator it = find (Explorar2.begin(), Explorar.end(), Explorar[i]);
-            if (it != Explorar.end())
-                Explorar2.push_back(Explorar[i]->Padre);
-        }
-        Explorar = Explorar2;
+        sort(Explorar.begin(), Explorar.end(), CompNodosKnn);
     }
     sort(res.begin(), res.end(), CompPuntos);
     return vector<vector<double>> (res.begin(), res.begin()+k);

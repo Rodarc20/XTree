@@ -42,6 +42,8 @@ class XTree {
         vector<vector<double>> AllEntries(Nodo * nodo);
         vector<vector<double> > KNN(vector<double> & p, int k);
 
+        vector<Nodo*> EncontrarHojas(vector<double>& p);
+
         bool Pertenece(vector<double>& p, vector<double>& RN, vector<double>& RP);
 
         int TypeOfOverlapDimension(double & R1ND, double & R1PD, double & R2ND, double & R2PD);

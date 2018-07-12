@@ -9,6 +9,7 @@ Nodo::Nodo(vector<double> p) {
     bDataPoint = true;
     bHoja = false;
     bSuperNode = false;
+    bVisitado = false;
     Padre = nullptr;
 }
 
@@ -16,6 +17,7 @@ Nodo::Nodo() {
     bDataPoint = false;
     bHoja = false;
     bSuperNode = false;
+    bVisitado = false;
     Padre = nullptr;
 }
 

@@ -6,6 +6,41 @@
 #include <queue>
 
 int ComAxis = 0;
+vector<double> referencia (90);
+
+double MinDist(vector<double> & punto, vector<double> & n, vector<double> & p) {
+    double acum = 0;
+    for (int i = 0; i < punto.size(); i++) {
+        double r;
+        if (punto[i] < n[i]) {
+            r = n[i];
+        }
+        else if (punto[i] > p[i]) {
+            r = p[i];
+        }
+        else {
+            r = punto[i];
+        }
+        acum += pow(punto[i] - r, 2);
+    }
+    return sqrt(acum);
+}
+bool CompNodosKnn(Nodo * n1, Nodo * n2) {
+    //return MinDist(referencia, )
+    return true;
+}
+double Distancia(vector<double>& p, vector<double>& q) {
+    double acum = 0;
+    for(int i = 0; i < p.size(); i++){
+        acum += pow(p[i]-q[i], 2);
+    }
+    //esta funcion de distancia podria ser muy costosa, y tambien podria desbordar, ver como reducir
+    return sqrt(acum);
+}
+
+bool CompPuntos(vector<double> & p, vector<double> & q) {
+    return Distancia(referencia, p) < Distancia(referencia, q);
+}
 
 bool CompEntriesByAxisLower(Nodo * & n1, Nodo * & n2) {
     return n1->PointN[ComAxis] < n2->PointN[ComAxis];
@@ -574,7 +609,51 @@ vector<vector<double>> XTree::AllEntries(Nodo * nodo) {
 }
 
 vector<vector<double>> XTree::KNN(vector<double>& p, int k) {
-    return vector<vector<double>>();
+    vector<vector<double>> res;
+    //buscar la hojas a las que pertenezca el puneto
+    referencia = p;
+    vector<Nodo *> Explorar = EncontrarHojas(p);
+    vector<Nodo *> Explorar2;
+    while (res.size() < k) {
+        for (int i = 0; i < Explorar.size(); i++) {
+            for (int j = 0; j < Explorar[i]->Hijos.size(); j++) {
+                if (!Explorar[i]->Hijos[j]->bVisitado) {
+                    vector<vector<double>> puntos = AllEntries(Explorar[i]->Hijos[i]);
+                    for (int j = 0; j < puntos.size(); j++) {
+                        res.push_back(puntos[i]);
+                    }
+                }
+            }
+            Explorar[i]->bVisitado = true;
+        }
+        for (int i = 0; Explorar.size(); i++) {
+            vector<Nodo *>::iterator it = find (Explorar2.begin(), Explorar.end(), Explorar[i]);
+            if (it != Explorar.end())
+                Explorar2.push_back(Explorar[i]->Padre);
+        }
+        Explorar = Explorar2;
+    }
+    sort(res.begin(), res.end(), CompPuntos);
+    return vector<vector<double>> (res.begin(), res.begin()+k);
+}
+
+vector<Nodo *> XTree::EncontrarHojas(vector<double> & p) {
+    vector<Nodo *> res;
+    queue<Nodo *> cola;
+    cola.push(Root);
+    while (!cola.empty()) {
+        Nodo * n = cola.front();
+        cola.pop();
+        if (n->bHoja && n->Pertenece(p)) {
+            res.push_back(n);
+        }
+        else {
+            for (int i = 0; i < n->Hijos.size(); i++) {
+                cola.push(n->Hijos[i]);
+            }
+        }
+    }
+    return res;
 }
 
 bool XTree::Pertenece(vector<double> & p, vector<double> & RN, vector<double> & RP) {
@@ -675,3 +754,11 @@ int XTree::TypeOfOverlap(vector<double>& R1N, vector<double>& R1P, vector<double
 //el problema es el overlap en las regiones, es posible que haya nodos que no devuelva por que estaban en un hermano muy alejado en el arbol, pero que est muy cerca a lo que busco?
 
 //para la busqueda de rango. solo debo buscar en las regiones que se intersectan, seguir las ideas de mi cabeza
+
+
+//para la busqueda de knn, encontrar las hojas en las que el punto pertenezca
+//seleccionar los puntos cercanos en las hojas y ponerlas en unvector, ordenar por cercania, si ya necestio mas ojas par retornar los k vecinos
+//debo ascender en el arbol, para ello debo marcar el nodo hoja, en el que estuve
+//al subir la padre, buscar en todos sus hijos, que en teria tambien son hojas.
+//agregar todos las hojas de esos hermanos, la vector resultado y ordenar, de nuevo si falta, subir un nivel marcarl nodo, y buscar en los hermanos del nodo padre
+//luego ascender marcando las hojas encontradas, 

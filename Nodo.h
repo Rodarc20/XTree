@@ -15,6 +15,7 @@ class Nodo {
         bool bDataPoint;
         bool bHoja;//si es hoja, tiene un DataPoint, es decir apunt hacia algo un registro o algo, si no es hoja quiere decir que tiene hijos
         bool bSuperNode;
+        bool bVisitado;
         double CoverageArea();
         void CalcularCoverage();
         double OverlapOf(int k);//overlap de la entrada 

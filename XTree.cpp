@@ -56,6 +56,7 @@ XTree::XTree(int Dimensiones) {
     //m = 8;
     M = 5;
     m = 2;
+    MaxOverlap = 100;
     Root = nullptr;
 }
 
@@ -63,6 +64,7 @@ XTree::XTree() {
     Dimensions = 3;
     M = 4;
     m = 2;
+    MaxOverlap = 100;
     Root = nullptr;
 }
 
@@ -134,7 +136,15 @@ Nodo * XTree::SplitNodo(Nodo * nodo) {
     }
     nodo->CalcularCoverage();
     NN->CalcularCoverage();
-
+    if (OverlapRegions(nodo->PointN, nodo->PointP, NN->PointN, NN->PointP) > MaxOverlap) {
+        for (int i = 0; i < NN->Hijos.size(); i++) {
+            nodo->AddHijo(NN->Hijos[i]);
+        }
+        nodo->bSuperNode = true;
+        nodo->CalcularCoverage();
+        delete NN;
+        NN = nullptr;
+    }
     return NN;
 }
 
@@ -632,7 +642,10 @@ vector<vector<double>> XTree::KNN(vector<double>& p, int k) {
         sort(Explorar.begin(), Explorar.end(), CompNodosKnn);
     }
     sort(res.begin(), res.end(), CompPuntos);
-    return vector<vector<double>> (res.begin(), res.begin()+k);
+    if(res.size() >= k)
+        return vector<vector<double>> (res.begin(), res.begin()+k);
+    else
+        return vector<vector<double>> (res.begin(), res.begin()+res.size());
 }
 
 vector<Nodo *> XTree::EncontrarHojas(vector<double> & p) {

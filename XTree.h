@@ -12,6 +12,7 @@ class XTree {
         int Dimensions;
         int M;
         int m; // m <= M/2
+        double MaxOverlap;
         Nodo * Root;
         Nodo * ChooseLeaf(Nodo * Data);
         Nodo * SplitNodo(Nodo * nodo);
